@@ -73,12 +73,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'medical_qr.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# Determine if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+db_path = '/tmp/db.sqlite3' if IS_VERCEL else str(BASE_DIR / 'db.sqlite3')
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        default=f'sqlite:///{db_path}',
         conn_max_age=600
     )
 }
