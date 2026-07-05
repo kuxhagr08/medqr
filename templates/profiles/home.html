@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 1rem;">
+    <h1 style="font-size: 3rem; color: var(--text-main); margin-bottom: 1rem;">
+        Your Life-Saving <span style="color: var(--primary);">Medical QR</span>
+    </h1>
+    <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto;">
+        Create your medical profile, get a unique QR code, and ensure your emergency contacts are notified instantly with your live location in case of an accident.
+    </p>
+    <div>
+        <a href="{% url 'register' %}" class="btn" style="font-size: 1.1rem; padding: 1rem 2rem;">Get Started for Free</a>
+    </div>
+    
+    <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 4rem; flex-wrap: wrap;">
+        <div class="card" style="flex: 1; min-width: 250px; text-align: left;">
+            <h3 style="font-size: 1.25rem; color: var(--primary); margin-bottom: 1rem;">1. Create Profile</h3>
+            <p style="color: var(--text-muted);">Fill in your vital medical information like blood group, allergies, and ongoing medications.</p>
+        </div>
+        <div class="card" style="flex: 1; min-width: 250px; text-align: left;">
+            <h3 style="font-size: 1.25rem; color: var(--primary); margin-bottom: 1rem;">2. Get QR Code</h3>
+            <p style="color: var(--text-muted);">Print or save your unique QR code as your lock screen wallpaper, or stick it on your helmet.</p>
+        </div>
+        <div class="card" style="flex: 1; min-width: 250px; text-align: left;">
+            <h3 style="font-size: 1.25rem; color: var(--primary); margin-bottom: 1rem;">3. Instant Alerts</h3>
+            <p style="color: var(--text-muted);">When scanned, bystanders can see your vital info and instantly email your emergency contacts with your GPS location.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

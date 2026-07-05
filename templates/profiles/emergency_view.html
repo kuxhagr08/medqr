@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Info - {{ profile.user.first_name|default:"User" }}</title>
+    <style>
+        :root {
+            --primary: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --radius: 12px;
+        }
+        body {
+            margin: 0; padding: 0; font-family: sans-serif;
+            background: var(--background); color: var(--text-main);
+        }
+        .header {
+            background: var(--primary); color: white;
+            padding: 2rem 1rem; text-align: center;
+        }
+        .container {
+            max-width: 600px; margin: -2rem auto 2rem;
+            padding: 0 1rem;
+        }
+        .card {
+            background: var(--surface); border-radius: var(--radius);
+            padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            display: block; width: 100%; background: var(--primary);
+            color: white; padding: 1rem; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            text-align: center; text-decoration: none;
+        }
+        .btn:active { opacity: 0.9; }
+        .data-row {
+            margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;
+        }
+        .data-row:last-child { border: none; margin-bottom: 0; padding-bottom: 0; }
+        .label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+        .value { font-size: 1.1rem; font-weight: bold; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0; font-size:1.5rem;">EMERGENCY MEDICAL INFO</h1>
+        <p style="margin:0.5rem 0 0 0; opacity: 0.9;">Please help this person</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>{{ profile.user.first_name }} {{ profile.user.last_name }}</h2>
+            <div class="data-row">
+                <div class="label">Blood Group</div>
+                <div class="value" style="color: var(--primary); font-size: 1.5rem;">{{ profile.blood_group|default:"Unknown" }}</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Allergies</div>
+                <div class="value">{{ profile.allergies|default:"None reported" }}</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Medical Conditions</div>
+                <div class="value">{{ profile.medical_conditions|default:"None reported" }}</div>
+            </div>
+            <div class="data-row">
+                <div class="label">Current Medications</div>
+                <div class="value">{{ profile.medications|default:"None reported" }}</div>
+            </div>
+        </div>
+
+        <button id="notifyBtn" class="btn">🚨 NOTIFY EMERGENCY CONTACTS</button>
+        <div id="statusMsg" style="text-align: center; margin-top: 1rem; font-weight: bold;"></div>
+    </div>
+
+    <script>
+        document.getElementById('notifyBtn').addEventListener('click', function() {
+            const btn = this;
+            const status = document.getElementById('statusMsg');
+            
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.innerText = 'Acquiring Location...';
+            
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        btn.innerText = 'Sending Alerts...';
+                        
+                        // Send to Django backend
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.status === 'success') {
+                                btn.style.background = '#10b981'; // green
+                                btn.innerText = '✓ CONTACTS NOTIFIED';
+                                status.innerText = 'Emergency contacts have been emailed with the live location.';
+                                status.style.color = '#10b981';
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(err => {
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.innerText = '🚨 NOTIFY EMERGENCY CONTACTS';
+                            status.innerText = 'Error sending alert. Please call an ambulance directly.';
+                            status.style.color = 'var(--primary)';
+                        });
+                    },
+                    function(error) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.innerText = '🚨 NOTIFY EMERGENCY CONTACTS';
+                        status.innerText = 'Please allow location access to send GPS coordinates.';
+                        status.style.color = 'var(--primary)';
+                    }
+                );
+            } else {
+                status.innerText = 'Geolocation not supported by this browser.';
+            }
+        });
+    </script>
+</body>
+</html>

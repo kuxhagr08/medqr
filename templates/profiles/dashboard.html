@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MedQR{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+    <!-- Main Content: Profile & Contacts -->
+    <div>
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Medical Profile</h2>
+                <a href="{% url 'update_profile' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Edit</a>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Blood Group</h4>
+                    <p style="font-size: 1.25rem; font-weight: 600;">{{ profile.blood_group|default:"Not specified" }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Allergies</h4>
+                    <p>{{ profile.allergies|default:"None" }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Medical Conditions</h4>
+                    <p>{{ profile.medical_conditions|default:"None" }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Current Medications</h4>
+                    <p>{{ profile.medications|default:"None" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Emergency Contacts</h2>
+                <a href="{% url 'add_contact' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">+ Add Contact</a>
+            </div>
+            
+            {% if contacts %}
+                <ul style="list-style: none; padding: 0;">
+                {% for contact in contacts %}
+                    <li style="padding: 1rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.1rem;">{{ contact.name }} <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">({{ contact.relation }})</span></h4>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">📞 {{ contact.phone }} | ✉️ {{ contact.email }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div style="text-align: center; padding: 2rem 0; color: var(--text-muted);">
+                    You haven't added any emergency contacts yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar: QR Code -->
+    <div>
+        <div class="card" style="text-align: center; position: sticky; top: 2rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--primary);">Your Emergency QR</h3>
+            <img src="data:image/png;base64,{{ qr_image }}" alt="Emergency QR Code" style="width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1rem;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Anyone who scans this code will see your medical profile and can instantly notify your contacts.
+            </p>
+            <a href="{{ emergency_url }}" target="_blank" class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;">Preview Scan View</a>
+        </div>
+    </div>
+</div>
+
+<!-- Responsive fix for grid -->
+<style>
+    @media (max-width: 768px) {
+        .container > div {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}

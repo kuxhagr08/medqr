@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - MedQR{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0;">{{ title }}</h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Back</a>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="help-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Save</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Add css classes to django form fields
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        if(el.type !== 'hidden' && el.type !== 'submit') {
+            el.classList.add('form-control');
+        }
+    });
+</script>
+{% endblock %}
