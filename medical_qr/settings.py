@@ -73,8 +73,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'medical_qr.wsgi.application'
 
 
-# Determine if running on Vercel
-IS_VERCEL = os.environ.get('VERCEL') == '1'
+# Determine if running on Vercel (Lambda)
+IS_VERCEL = '/var/task' in str(BASE_DIR) or os.environ.get('VERCEL') == '1' or os.environ.get('AWS_EXECUTION_ENV') is not None
 db_path = '/tmp/db.sqlite3' if IS_VERCEL else str(BASE_DIR / 'db.sqlite3')
 
 DATABASES = {
