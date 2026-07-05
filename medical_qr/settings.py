@@ -73,9 +73,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'medical_qr.wsgi.application'
 
 
-# Determine if running on Vercel (Lambda)
-IS_VERCEL = '/var/task' in str(BASE_DIR) or os.environ.get('VERCEL') == '1' or os.environ.get('AWS_EXECUTION_ENV') is not None
-db_path = '/tmp/db.sqlite3' if IS_VERCEL else str(BASE_DIR / 'db.sqlite3')
+# Database - use /tmp on Vercel (read-only filesystem), else local
+# Try writing to BASE_DIR, if it fails use /tmp (Vercel/serverless)
+import tempfile
+try:
+    _test_path = BASE_DIR / '.write_test'
+    _test_path.touch()
+    _test_path.unlink()
+    db_path = str(BASE_DIR / 'db.sqlite3')
+except OSError:
+    db_path = '/tmp/db.sqlite3'
 
 DATABASES = {
     'default': dj_database_url.config(

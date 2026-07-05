@@ -3,94 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Info - {{ profile.user.first_name|default:"User" }}</title>
+    <title>🚨 Emergency Info - {{ profile.user.first_name|default:"Patient" }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #ef4444;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --radius: 12px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0; padding: 0; font-family: sans-serif;
-            background: var(--background); color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #f0f0f0;
+            min-height: 100vh;
         }
+
+        /* ---- TOP RED EMERGENCY HEADER ---- */
         .header {
-            background: var(--primary); color: white;
-            padding: 2rem 1rem; text-align: center;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            padding: 1.5rem 1.2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
+        .header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px);
+        }
+        .pulse-ring {
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            border: 3px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            width: 110%; height: 110%;
+            animation: ripple 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        @keyframes ripple { 0%{width:110%;height:110%;opacity:1} 100%{width:160%;height:160%;opacity:0} }
+        .header h1 { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; }
+        .header p { font-size: 0.9rem; opacity: 0.85; margin-top: 0.3rem; }
+
+        /* ---- MAIN CARD ---- */
         .container {
-            max-width: 600px; margin: -2rem auto 2rem;
+            max-width: 500px;
+            margin: -2rem auto 2rem;
             padding: 0 1rem;
         }
-        .card {
-            background: var(--surface); border-radius: var(--radius);
-            padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
+        .name-card {
+            background: #1c1c1e;
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2a2a2e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
-        .btn {
-            display: block; width: 100%; background: var(--primary);
-            color: white; padding: 1rem; border: none; border-radius: 8px;
-            font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            text-align: center; text-decoration: none;
+        .patient-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
         }
-        .btn:active { opacity: 0.9; }
-        .data-row {
-            margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;
+        .patient-name span { color: #ef4444; }
+
+        /* ---- INFO GRID ---- */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
-        .data-row:last-child { border: none; margin-bottom: 0; padding-bottom: 0; }
-        .label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        .value { font-size: 1.1rem; font-weight: bold; margin-top: 0.25rem; }
+        .info-card {
+            background: #1c1c1e;
+            border-radius: 14px;
+            padding: 1rem;
+            border: 1px solid #2a2a2e;
+        }
+        .info-card.blood {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #450a0a, #1c1c1e);
+            border-color: #dc2626;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .blood-icon { font-size: 2.5rem; }
+        .blood-value { font-size: 2.2rem; font-weight: 900; color: #ef4444; }
+        .blood-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .info-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; }
+        .info-value { font-size: 0.95rem; font-weight: 600; color: #e0e0e0; line-height: 1.4; }
+
+        /* ---- CALL NOW BUTTONS ---- */
+        .contacts-section { margin-bottom: 1rem; }
+        .contacts-title {
+            font-size: 0.75rem; color: #888; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 0.6rem; padding-left: 0.2rem;
+        }
+        .call-card {
+            background: #1c1c1e;
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #2a2a2e;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 0.6rem;
+        }
+        .contact-info .contact-name { font-size: 1rem; font-weight: 700; }
+        .contact-info .contact-rel { font-size: 0.8rem; color: #888; margin-top: 0.1rem; }
+        .call-now-btn {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 0.4rem;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(22,163,74,0.4);
+            transition: transform 0.1s;
+        }
+        .call-now-btn:active { transform: scale(0.95); }
+
+        /* ---- ALERT BUTTON ---- */
+        #notifyBtn {
+            display: block; width: 100%;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white; padding: 1.1rem;
+            border: none; border-radius: 14px;
+            font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; text-align: center;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(220,38,38,0.5);
+            margin-bottom: 0.75rem;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        #notifyBtn:active { transform: scale(0.98); }
+        #statusMsg {
+            text-align: center; font-weight: 600;
+            font-size: 0.9rem; min-height: 1.5rem;
+            padding: 0 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 style="margin:0; font-size:1.5rem;">EMERGENCY MEDICAL INFO</h1>
-        <p style="margin:0.5rem 0 0 0; opacity: 0.9;">Please help this person</p>
+        <div class="pulse-ring">❤️</div>
+        <h1>EMERGENCY MEDICAL INFO</h1>
+        <p>Show this screen to emergency responders</p>
     </div>
 
     <div class="container">
-        <div class="card">
-            <h2>{{ profile.user.first_name }} {{ profile.user.last_name }}</h2>
-            <div class="data-row">
-                <div class="label">Blood Group</div>
-                <div class="value" style="color: var(--primary); font-size: 1.5rem;">{{ profile.blood_group|default:"Unknown" }}</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Allergies</div>
-                <div class="value">{{ profile.allergies|default:"None reported" }}</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Medical Conditions</div>
-                <div class="value">{{ profile.medical_conditions|default:"None reported" }}</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Current Medications</div>
-                <div class="value">{{ profile.medications|default:"None reported" }}</div>
+
+        <!-- Patient Name -->
+        <div class="name-card">
+            <div class="patient-name">
+                {{ profile.user.first_name|default:"Unknown" }}
+                <span>{{ profile.user.last_name }}</span>
             </div>
         </div>
 
-        <button id="notifyBtn" class="btn">🚨 NOTIFY EMERGENCY CONTACTS</button>
-        <div id="statusMsg" style="text-align: center; margin-top: 1rem; font-weight: bold;"></div>
+        <!-- Key Medical Info -->
+        <div class="info-grid">
+            <div class="info-card blood">
+                <div class="blood-icon">🩸</div>
+                <div>
+                    <div class="blood-label">Blood Group</div>
+                    <div class="blood-value">{{ profile.blood_group|default:"?" }}</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">⚠️ Allergies</div>
+                <div class="info-value">{{ profile.allergies|default:"None reported" }}</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">💊 Medications</div>
+                <div class="info-value">{{ profile.medications|default:"None reported" }}</div>
+            </div>
+
+            <div class="info-card" style="grid-column: span 2;">
+                <div class="info-label">🏥 Medical Conditions</div>
+                <div class="info-value">{{ profile.medical_conditions|default:"None reported" }}</div>
+            </div>
+        </div>
+
+        <!-- Emergency Contacts with CALL NOW -->
+        {% if contacts %}
+        <div class="contacts-section">
+            <div class="contacts-title">📞 Emergency Contacts</div>
+            {% for contact in contacts %}
+            <div class="call-card">
+                <div class="contact-info">
+                    <div class="contact-name">{{ contact.name }}</div>
+                    <div class="contact-rel">{{ contact.relation }} · {{ contact.phone }}</div>
+                </div>
+                <a href="tel:{{ contact.phone }}" class="call-now-btn">
+                    📞 Call Now
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Notify + GPS Button -->
+        <button id="notifyBtn">🚨 SEND GPS ALERT TO ALL CONTACTS</button>
+        <div id="statusMsg"></div>
     </div>
 
     <script>
         document.getElementById('notifyBtn').addEventListener('click', function() {
             const btn = this;
             const status = document.getElementById('statusMsg');
-            
+
             btn.disabled = true;
             btn.style.opacity = '0.7';
-            btn.innerText = 'Acquiring Location...';
-            
+            btn.innerText = '📍 Getting Location...';
+
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
-                        btn.innerText = 'Sending Alerts...';
-                        
-                        // Send to Django backend
+                        btn.innerText = '📡 Sending Alerts...';
+
                         fetch(window.location.href, {
                             method: 'POST',
                             headers: {
@@ -102,35 +238,31 @@
                                 lng: position.coords.longitude
                             })
                         })
-                        .then(response => response.json())
+                        .then(r => r.json())
                         .then(data => {
-                            if(data.status === 'success') {
-                                btn.style.background = '#10b981'; // green
-                                btn.innerText = '✓ CONTACTS NOTIFIED';
-                                status.innerText = 'Emergency contacts have been emailed with the live location.';
-                                status.style.color = '#10b981';
-                            } else {
-                                throw new Error(data.message);
-                            }
+                            if (data.status === 'success') {
+                                btn.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
+                                btn.innerText = '✅ ALL CONTACTS NOTIFIED WITH GPS';
+                                status.innerText = 'Emergency contacts have been alerted with live location.';
+                                status.style.color = '#4ade80';
+                            } else { throw new Error(data.message); }
                         })
                         .catch(err => {
                             btn.disabled = false;
                             btn.style.opacity = '1';
-                            btn.innerText = '🚨 NOTIFY EMERGENCY CONTACTS';
-                            status.innerText = 'Error sending alert. Please call an ambulance directly.';
-                            status.style.color = 'var(--primary)';
+                            btn.innerText = '🚨 SEND GPS ALERT TO ALL CONTACTS';
+                            status.innerText = 'Alert failed. Please call contacts directly above.';
+                            status.style.color = '#f87171';
                         });
                     },
-                    function(error) {
+                    function() {
                         btn.disabled = false;
                         btn.style.opacity = '1';
-                        btn.innerText = '🚨 NOTIFY EMERGENCY CONTACTS';
-                        status.innerText = 'Please allow location access to send GPS coordinates.';
-                        status.style.color = 'var(--primary)';
+                        btn.innerText = '🚨 SEND GPS ALERT TO ALL CONTACTS';
+                        status.innerText = '⚠️ Allow location access and try again.';
+                        status.style.color = '#fbbf24';
                     }
                 );
-            } else {
-                status.innerText = 'Geolocation not supported by this browser.';
             }
         });
     </script>
